@@ -20,7 +20,7 @@ public:
     virtual void update() = 0;
 
     const std::pair<float, float>& getPos() const;
-    virtual void setPos(std::pair<float, float> p);
+    virtual void setPos(std::pair<float, float> pos);
 
     const float& getWidth() const;
     void setWidth(float w);
