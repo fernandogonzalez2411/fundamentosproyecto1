@@ -8,10 +8,10 @@ public:
     Paddle(std::pair<float, float> pos, float w, float h);
     virtual ~Paddle();
 
-    virtual void update();
+    void update() override;
     void makeNewVertices();
 
-    virtual void setPos(std::pair<float, float> pos) override;
+    void setPos(std::pair<float, float> pos) override;
 };
  
 #endif /* PADDLE_H_ */

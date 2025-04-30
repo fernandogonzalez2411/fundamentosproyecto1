@@ -19,15 +19,15 @@ public:
 
     virtual void update() = 0;
 
-    virtual const std::pair<float, float>& getPos() const;
+    const std::pair<float, float>& getPos() const;
     virtual void setPos(std::pair<float, float> p);
 
-    virtual const float& getWidth() const;
-    virtual void setWidth(float w);
-    virtual const float& getHeight() const;
-    virtual void setHeight(float h);
+    const float& getWidth() const;
+    void setWidth(float w);
+    const float& getHeight() const;
+    void setHeight(float h);
 
-    virtual const std::vector<std::pair<float, float>>& getVertices() const;
+    const std::vector<std::pair<float, float>>& getVertices() const;
 };
  
 #endif /* GAMEOBJECT_H_ */
