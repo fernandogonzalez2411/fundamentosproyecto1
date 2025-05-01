@@ -32,7 +32,6 @@ T clamp(T value, T min, T max) {
 // Barra: rectángulo horizontal estrecho
 Rectangle paddle({0, -0.875f}, 0.4f, 0.05f);
 
-float offsetX = 0.0f;         // Posición horizontal de la barra
 float velocity = 0.02f;       // Velocidad de movimiento
 
 void processInput(GLFWwindow* window) {
