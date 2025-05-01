@@ -11,7 +11,10 @@ protected:
     float width;
     float height;
 
-    std::vector<std::pair<float, float>> vertices;
+    std::vector<float> flatVertices;
+    std::vector<int> indices;
+
+    virtual void updateVertices() = 0;
 
 public:
     GameObject(std::pair<float, float> pos, float w, float h);
@@ -21,13 +24,13 @@ public:
 
     const std::pair<float, float>& getPos() const;
     virtual void setPos(std::pair<float, float> pos);
-
     const float& getWidth() const;
-    void setWidth(float w);
+    virtual void setWidth(float w);
     const float& getHeight() const;
-    void setHeight(float h);
-
-    const std::vector<std::pair<float, float>>& getVertices() const;
+    virtual void setHeight(float h);
+    const std::vector<float>& getFlatVertices() const;
+    const std::vector<std::pair<float, float>> getVertices() const;
+    const std::vector<int>& getIndices() const;
 };
  
 #endif /* GAMEOBJECT_H_ */
