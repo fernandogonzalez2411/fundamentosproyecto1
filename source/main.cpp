@@ -6,6 +6,7 @@
 
 #include "GameObject.h"
 #include "Rectangle.h"
+#include "Circle.h"
 
 // Vertex Shader con desplazamiento
 const char* vertexShaderSource = R"(
@@ -30,7 +31,7 @@ T clamp(T value, T min, T max) {
 }
 
 // Barra: rectángulo horizontal estrecho
-Rectangle paddle({0, -0.875f}, 0.4f, 0.05f);
+Circle paddle({0, -0.875f}, 0.05f);
 
 float velocity = 0.02f;       // Velocidad de movimiento
 
@@ -115,7 +116,7 @@ int main() {
         glUniform1f(offsetLoc, paddle.getPos().first);
 
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, paddle.getIndices().size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
     }
