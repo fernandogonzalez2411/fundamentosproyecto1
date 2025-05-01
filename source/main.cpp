@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include "GameObject.h"
-#include "Paddle.h"
+#include "Rectangle.h"
 
 // Vertex Shader con desplazamiento
 const char* vertexShaderSource = R"(
@@ -30,29 +30,22 @@ T clamp(T value, T min, T max) {
 }
 
 // Barra: rectángulo horizontal estrecho
-float barVertices[] = {
-    -0.2f, -0.9f,
-     0.2f, -0.9f,
-     0.2f, -0.85f,
-    -0.2f, -0.85f
-};
-
-unsigned int indices[] = {
-    0, 1, 2,
-    2, 3, 0
-};
+Rectangle paddle({0, -0.875f}, 0.4f, 0.05f);
 
 float offsetX = 0.0f;         // Posición horizontal de la barra
 float velocity = 0.02f;       // Velocidad de movimiento
 
 void processInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        offsetX -= velocity;
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        offsetX += velocity;
+    std::pair<float, float> pos = paddle.getPos();
 
-    // Limitar movimiento dentro de [-0.8, 0.8] para que no se salga
-    offsetX = clamp(offsetX, -0.8f, 0.8f);
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        pos.first -= velocity;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        pos.first += velocity;
+    }
+    
+    paddle.setPos(pos);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -100,10 +93,12 @@ int main() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(barVertices), barVertices, GL_STATIC_DRAW);
+    const std::vector<float>& barVertices = paddle.getFlatVertices();
+    glBufferData(GL_ARRAY_BUFFER, barVertices.size() * sizeof(float), barVertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    const std::vector<int>& indices = paddle.getIndices();
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -118,7 +113,7 @@ int main() {
 
         glUseProgram(shaderProgram);
         int offsetLoc = glGetUniformLocation(shaderProgram, "uOffsetX");
-        glUniform1f(offsetLoc, offsetX);
+        glUniform1f(offsetLoc, paddle.getPos().first);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
