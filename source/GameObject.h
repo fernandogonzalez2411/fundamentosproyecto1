@@ -15,12 +15,11 @@ protected:
     std::vector<int> indices;
 
     virtual void updateVertices() = 0;
+    virtual void updateIndices() = 0;
 
 public:
     GameObject(std::pair<float, float> pos, float w, float h);
     virtual ~GameObject() {}
-
-    virtual void update() = 0;
 
     const std::pair<float, float>& getPos() const;
     virtual void setPos(std::pair<float, float> pos);

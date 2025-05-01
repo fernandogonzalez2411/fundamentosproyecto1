@@ -3,7 +3,7 @@
 Rectangle::Rectangle(std::pair<float, float> pos, float w, float h) : GameObject(pos, w, h) {
     flatVertices.resize(8);
     updateVertices();
-    indices = {0, 1, 2, 2, 3, 0};
+    updateIndices();
 }
 Rectangle::~Rectangle() {}
 
@@ -21,19 +21,6 @@ void Rectangle::updateVertices() {
     flatVertices[7] = position.second + halfH;
 }
 
-void Rectangle::update() {
-
-}
-
-void Rectangle::setPos(std::pair<float, float> pos) {
-    position = pos;
-    updateVertices();
-}
-void Rectangle::setWidth(float w) {
-    width = w;
-    updateVertices();
-}
-void Rectangle::setHeight(float h) {
-    height = h;
-    updateVertices();
+void Rectangle::updateIndices() {
+    indices = {0, 1, 2, 2, 3, 0};
 }
