@@ -12,10 +12,26 @@
 const char* vertexShaderSource = R"(
 #version 330 core
 layout (location = 0) in vec2 aPos;
-uniform float uOffsetX;
+uniform float uOffsetX1, uOffsetY1;
+uniform float uOffsetX2, uOffsetY2;
+uniform float uOffsetX3, uOffsetY3;
+uniform float uOffsetX4, uOffsetY4;
+uniform float uOffsetX5, uOffsetY5;
+
 void main() {
-    gl_Position = vec4(aPos.x + uOffsetX, aPos.y, 0.0, 1.0);
+    if (gl_VertexID < 6) {
+        gl_Position = vec4(aPos.x + uOffsetX1, aPos.y + uOffsetY1, 0.0, 1.0);
+    } else if (gl_VertexID < 12) {
+        gl_Position = vec4(aPos.x + uOffsetX2, aPos.y + uOffsetY2, 0.0, 1.0);
+    } else if (gl_VertexID < 18) {
+        gl_Position = vec4(aPos.x + uOffsetX3, aPos.y + uOffsetY3, 0.0, 1.0);
+    } else if (gl_VertexID < 24) {
+        gl_Position = vec4(aPos.x + uOffsetX4, aPos.y + uOffsetY4, 0.0, 1.0);
+    } else if (gl_VertexID < 30) {
+        gl_Position = vec4(aPos.x + uOffsetX5, aPos.y + uOffsetY5, 0.0, 1.0);
+    }
 })";
+
 
 // Fragment Shader simple blanco
 const char* fragmentShaderSource = R"(
@@ -31,21 +47,47 @@ T clamp(T value, T min, T max) {
 }
 
 // Barra: rectángulo horizontal estrecho
-Circle paddle({0, -0.875f}, 0.05f);
+float paddleWidth = 0.05f;
+float paddleHeight = 0.4f;
+float ballRadius = 0.1f;
+Rectangle paddleLeftTop({-0.45f, 0.25f}, paddleWidth, paddleHeight, 0);
+Rectangle paddleLeftBottom({-0.45f, -0.25f}, paddleWidth, paddleHeight, 1);
+Rectangle paddleRightTop({0.45f, 0.25f}, paddleWidth, paddleHeight, 2);
+Rectangle paddleRightBottom({0.45f, -0.25f}, paddleWidth, paddleHeight, 3);
+Rectangle ball({0, 0}, ballRadius, ballRadius, 4);
 
-float velocity = 0.02f;       // Velocidad de movimiento
+float velocity = 0.002f;       // Velocidad de movimiento
 
 void processInput(GLFWwindow* window) {
-    std::pair<float, float> pos = paddle.getPos();
+    auto posLeftTop = paddleLeftTop.getPos();
+    auto posLeftBottom = paddleLeftBottom.getPos();
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        pos.first -= velocity;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        posLeftTop.second += velocity;
+        posLeftBottom.second -= velocity;
     }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        pos.first += velocity;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        posLeftTop.second -= velocity;
+        posLeftBottom.second += velocity;
     }
-    
-    paddle.setPos(pos);
+
+    paddleLeftTop.setPos(posLeftTop);
+    paddleLeftBottom.setPos(posLeftBottom);
+
+    auto posRightTop = paddleRightTop.getPos();
+    auto posRightBottom = paddleRightBottom.getPos();
+
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        posRightTop.second += velocity;
+        posRightBottom.second -= velocity;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        posRightTop.second -= velocity;
+        posRightBottom.second += velocity;
+    }
+
+    paddleRightTop.setPos(posRightTop);
+    paddleRightBottom.setPos(posRightBottom);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -59,7 +101,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Barra Pong", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Pong", NULL, NULL);
     if (!window) { std::cerr << "Error al crear ventana\n"; glfwTerminate(); return -1; }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -93,11 +135,23 @@ int main() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    const std::vector<float>& barVertices = paddle.getFlatVertices();
+
+    std::vector<float> barVertices;
+    barVertices.insert(barVertices.end(), paddleLeftTop.getFlatVertices().begin(), paddleLeftTop.getFlatVertices().end());
+    barVertices.insert(barVertices.end(), paddleLeftBottom.getFlatVertices().begin(), paddleLeftBottom.getFlatVertices().end());
+    barVertices.insert(barVertices.end(), paddleRightTop.getFlatVertices().begin(), paddleRightTop.getFlatVertices().end());
+    barVertices.insert(barVertices.end(), paddleRightBottom.getFlatVertices().begin(), paddleRightBottom.getFlatVertices().end());
+    barVertices.insert(barVertices.end(), ball.getFlatVertices().begin(), ball.getFlatVertices().end());
+
     glBufferData(GL_ARRAY_BUFFER, barVertices.size() * sizeof(float), barVertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    const std::vector<int>& indices = paddle.getIndices();
+    std::vector<int> indices;
+    indices.insert(indices.end(), paddleLeftTop.getIndices().begin(), paddleLeftTop.getIndices().end());
+    indices.insert(indices.end(), paddleLeftBottom.getIndices().begin(), paddleLeftBottom.getIndices().end());
+    indices.insert(indices.end(), paddleRightTop.getIndices().begin(), paddleRightTop.getIndices().end());
+    indices.insert(indices.end(), paddleRightBottom.getIndices().begin(), paddleRightBottom.getIndices().end());
+    indices.insert(indices.end(), ball.getIndices().begin(), ball.getIndices().end());
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
@@ -112,11 +166,35 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        int offsetLoc = glGetUniformLocation(shaderProgram, "uOffsetX");
-        glUniform1f(offsetLoc, paddle.getPos().first);
+
+        int offsetX1Loc = glGetUniformLocation(shaderProgram, "uOffsetX1");
+        int offsetY1Loc = glGetUniformLocation(shaderProgram, "uOffsetY1");
+        int offsetX2Loc = glGetUniformLocation(shaderProgram, "uOffsetX2");
+        int offsetY2Loc = glGetUniformLocation(shaderProgram, "uOffsetY2");
+        int offsetX3Loc = glGetUniformLocation(shaderProgram, "uOffsetX3");
+        int offsetY3Loc = glGetUniformLocation(shaderProgram, "uOffsetY3");
+        int offsetX4Loc = glGetUniformLocation(shaderProgram, "uOffsetX4");
+        int offsetY4Loc = glGetUniformLocation(shaderProgram, "uOffsetY4");
+        int offsetX5Loc = glGetUniformLocation(shaderProgram, "uOffsetX5");
+        int offsetY5Loc = glGetUniformLocation(shaderProgram, "uOffsetY5");
+
+        glUniform1f(offsetX1Loc, paddleLeftTop.getPos().first);
+        glUniform1f(offsetY1Loc, paddleLeftTop.getPos().second);
+
+        glUniform1f(offsetX2Loc, paddleLeftBottom.getPos().first);
+        glUniform1f(offsetY2Loc, paddleLeftBottom.getPos().second);
+
+        glUniform1f(offsetX3Loc, paddleRightTop.getPos().first);
+        glUniform1f(offsetY3Loc, paddleRightTop.getPos().second);
+
+        glUniform1f(offsetX4Loc, paddleRightBottom.getPos().first);
+        glUniform1f(offsetY4Loc, paddleRightBottom.getPos().second);
+
+        glUniform1f(offsetX5Loc, ball.getPos().first);
+        glUniform1f(offsetY5Loc, ball.getPos().second);
 
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, paddle.getIndices().size(), GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6 * 5);
 
         glfwSwapBuffers(window);
     }

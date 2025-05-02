@@ -6,10 +6,10 @@
 class Circle : public GameObject {
 private:
     void updateVertices() override;
-    void updateIndices() override;
+    void updateIndices(int num) override;
 
 public:
-    Circle(std::pair<float, float> pos, float r);
+    Circle(std::pair<float, float> pos, float r, int num = 0);
     virtual ~Circle();
 };
  

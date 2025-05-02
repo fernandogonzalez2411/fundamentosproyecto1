@@ -6,10 +6,10 @@
 class Rectangle : public GameObject {
 private:
     void updateVertices() override;
-    void updateIndices() override;
+    void updateIndices(int num) override;
 
 public:
-    Rectangle(std::pair<float, float> pos, float w, float h);
+    Rectangle(std::pair<float, float> pos, float w, float h, int num = 0);
     virtual ~Rectangle();
 };
  

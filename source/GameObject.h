@@ -15,7 +15,7 @@ protected:
     std::vector<int> indices;
 
     virtual void updateVertices() = 0;
-    virtual void updateIndices() = 0;
+    virtual void updateIndices(int num) = 0;
 
 public:
     GameObject(std::pair<float, float> pos, float w, float h);

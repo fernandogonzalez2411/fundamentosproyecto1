@@ -3,10 +3,10 @@
 
 #define segments 40
 
-Circle::Circle(std::pair<float, float> pos, float r) : GameObject(pos, r * 2, r * 2) {
+Circle::Circle(std::pair<float, float> pos, float r, int num) : GameObject(pos, r * 2, r * 2) {
     flatVertices.resize((segments + 1) * 2);
     updateVertices();
-    updateIndices();
+    updateIndices(num);
 }
 Circle::~Circle() {}
 
@@ -28,7 +28,7 @@ void Circle::updateVertices() {
     }
 }
 
-void Circle::updateIndices() {
+void Circle::updateIndices(int num) {
     indices.clear();
     for (int i = 1; i < segments; i++) {
         indices.push_back(0);
