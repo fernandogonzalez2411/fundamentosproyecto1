@@ -21,6 +21,8 @@ public:
     GameObject(std::pair<float, float> pos, float w, float h);
     virtual ~GameObject() {}
 
+    virtual bool isColliding(const GameObject& other);
+
     const std::pair<float, float>& getPos() const;
     virtual void setPos(std::pair<float, float> pos);
     const float& getWidth() const;

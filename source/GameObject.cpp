@@ -2,6 +2,24 @@
 
 GameObject::GameObject(std::pair<float, float> pos, float w, float h) : position(pos), width(w), height(h) { }
 
+bool GameObject::isColliding(const GameObject& other) {
+    float leftA = getPos().first - getWidth();
+    float rightA = getPos().first + getWidth();
+    float topA = getPos().second + getHeight();
+    float bottomA = getPos().second - getHeight();
+
+    float leftB = other.getPos().first - other.getWidth();
+    float rightB = other.getPos().first + other.getWidth();
+    float topB = other.getPos().second + other.getHeight();
+    float bottomB = other.getPos().second - other.getHeight();
+
+    if (rightA < leftB || rightB < leftA || topA < bottomB || topB < bottomA) {
+        return false;
+    }
+
+    return true;
+}
+
 const std::pair<float, float>& GameObject::getPos() const {
     return position;
 }
