@@ -6,7 +6,6 @@
 
 #include "GameObject.h"
 #include "Rectangle.h"
-#include "Circle.h"
 
 // Vertex Shader con desplazamiento
 const char* vertexShaderSource = R"(
