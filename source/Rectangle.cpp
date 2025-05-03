@@ -8,27 +8,22 @@ Rectangle::Rectangle(std::pair<float, float> pos, float w, float h, int num) : G
 Rectangle::~Rectangle() {}
 
 void Rectangle::updateVertices() {
-    float halfW = width / 2;
-    float halfH = height / 2;
+    float side = width / 2;
+    float otherSide = height / 2;
 
-    float left = position.first - halfW;
-    float right = position.first + halfW;
-    float top = position.second + halfH;
-    float bottom = position.second - halfH;
+    flatVertices[0] = -side;
+    flatVertices[1] = otherSide;
+    flatVertices[2] = -side;
+    flatVertices[3] = -otherSide;
+    flatVertices[4] = side;
+    flatVertices[5] = -otherSide;
 
-    flatVertices[0] = left;
-    flatVertices[1] = top;
-    flatVertices[2] = left;
-    flatVertices[3] = bottom;
-    flatVertices[4] = right;
-    flatVertices[5] = bottom;
-
-    flatVertices[6] = left;
-    flatVertices[7] = top;
-    flatVertices[8] = right;
-    flatVertices[9] = bottom;
-    flatVertices[10] = right;
-    flatVertices[11] = top;
+    flatVertices[6] = -side;
+    flatVertices[7] = otherSide;
+    flatVertices[8] = side;
+    flatVertices[9] = -otherSide;
+    flatVertices[10] = side;
+    flatVertices[11] = otherSide;
 }
 
 void Rectangle::updateIndices(int num) {

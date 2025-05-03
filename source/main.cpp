@@ -50,10 +50,10 @@ T clamp(T value, T min, T max) {
 float paddleWidth = 0.05f;
 float paddleHeight = 0.4f;
 float ballRadius = 0.1f;
-Rectangle paddleLeftTop({-0.45f, 0.25f}, paddleWidth, paddleHeight, 0);
-Rectangle paddleLeftBottom({-0.45f, -0.25f}, paddleWidth, paddleHeight, 1);
-Rectangle paddleRightTop({0.45f, 0.25f}, paddleWidth, paddleHeight, 2);
-Rectangle paddleRightBottom({0.45f, -0.25f}, paddleWidth, paddleHeight, 3);
+Rectangle paddleLeftTop({-0.9f, 0.5f}, paddleWidth, paddleHeight, 0);
+Rectangle paddleLeftBottom({-0.9f, -0.5f}, paddleWidth, paddleHeight, 1);
+Rectangle paddleRightTop({0.9f, 0.5f}, paddleWidth, paddleHeight, 2);
+Rectangle paddleRightBottom({0.9f, -0.5f}, paddleWidth, paddleHeight, 3);
 Rectangle ball({0, 0}, ballRadius, ballRadius, 4);
 
 float velocity = 0.002f;       // Velocidad de movimiento
