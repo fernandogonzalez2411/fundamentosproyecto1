@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 #include "GameObject.h"
 #include "Rectangle.h"
@@ -95,6 +97,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 int main() {
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
+
     // Inicialización
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -170,10 +174,18 @@ int main() {
         if (ball.isColliding(paddleLeftTop) || ball.isColliding(paddleLeftBottom)) {
             speedBall.first *= -1;
             ballPos.first = paddleLeftTop.getPos().first + (paddleLeftTop.getWidth() / 2) + (ball.getWidth() / 2);
+            int aux = speedBall.second > 0 ? 1 : -1;
+            speedBall.second = (((rand() % 6) + 1) / 1000.0f) * aux;
         }
         else if (ball.isColliding(paddleRightTop) || ball.isColliding(paddleRightBottom)) {
             speedBall.first *= -1;
             ballPos.first = paddleRightTop.getPos().first - (paddleRightTop.getWidth() / 2) - (ball.getWidth() / 2);
+            int aux = speedBall.second > 0 ? 1 : -1;
+            speedBall.second = (((rand() % 6) + 1) / 1000.0f) * aux;
+        }
+        else if (ballPos.first - (ball.getWidth() / 2) <= -1 || ballPos.first + (ball.getWidth() / 2) >= 1) {
+            ballPos = {0, 0};
+            speedBall.first *= -1;
         }
 
         ballPos.first += speedBall.first;
