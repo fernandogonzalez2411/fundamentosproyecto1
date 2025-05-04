@@ -55,19 +55,20 @@ Rectangle paddleRightTop({0.9f, 0.5f}, paddleWidth, paddleHeight, 2);
 Rectangle paddleRightBottom({0.9f, -0.5f}, paddleWidth, paddleHeight, 3);
 Rectangle ball({0, 0}, ballRadius, ballRadius, 4);
 
-float velocity = 0.002f;       // Velocidad de movimiento
+float speedPaddleY = 0.002f;       // Velocidad de movimiento
+std::pair<float, float> speedBall = {0.004f, 0.003f};
 
 void processInput(GLFWwindow* window) {
     auto posLeftTop = paddleLeftTop.getPos();
     auto posLeftBottom = paddleLeftBottom.getPos();
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        posLeftTop.second += velocity;
-        posLeftBottom.second -= velocity;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && posLeftTop.second + (paddleLeftTop.getHeight() / 2) + speedPaddleY <= 1) {
+        posLeftTop.second += speedPaddleY;
+        posLeftBottom.second -= speedPaddleY;
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        posLeftTop.second -= velocity;
-        posLeftBottom.second += velocity;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && posLeftTop.second - (paddleLeftTop.getHeight() / 2) - speedPaddleY >= 0) {
+        posLeftTop.second -= speedPaddleY;
+        posLeftBottom.second += speedPaddleY;
     }
 
     paddleLeftTop.setPos(posLeftTop);
@@ -76,13 +77,13 @@ void processInput(GLFWwindow* window) {
     auto posRightTop = paddleRightTop.getPos();
     auto posRightBottom = paddleRightBottom.getPos();
 
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        posRightTop.second += velocity;
-        posRightBottom.second -= velocity;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && posRightTop.second + (paddleRightTop.getHeight() / 2) + speedPaddleY <= 1) {
+        posRightTop.second += speedPaddleY;
+        posRightBottom.second -= speedPaddleY;
     }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        posRightTop.second -= velocity;
-        posRightBottom.second += velocity;
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && posRightTop.second - (paddleRightTop.getHeight() / 2) - speedPaddleY >= 0) {
+        posRightTop.second -= speedPaddleY;
+        posRightBottom.second += speedPaddleY;
     }
 
     paddleRightTop.setPos(posRightTop);
@@ -159,6 +160,26 @@ int main() {
     // Loop principal
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
+
+        auto ballPos = ball.getPos();
+
+        if (ballPos.second + (ball.getHeight() / 2) >= 1 || ballPos.second - (ball.getHeight() / 2) <= -1) {
+            speedBall.second *= -1;
+        }
+
+        if (ball.isColliding(paddleLeftTop) || ball.isColliding(paddleLeftBottom)) {
+            speedBall.first *= -1;
+            ballPos.first = paddleLeftTop.getPos().first + (paddleLeftTop.getWidth() / 2) + (ball.getWidth() / 2);
+        }
+        else if (ball.isColliding(paddleRightTop) || ball.isColliding(paddleRightBottom)) {
+            speedBall.first *= -1;
+            ballPos.first = paddleRightTop.getPos().first - (paddleRightTop.getWidth() / 2) - (ball.getWidth() / 2);
+        }
+
+        ballPos.first += speedBall.first;
+        ballPos.second += speedBall.second;
+        ball.setPos(ballPos);
+
         glfwPollEvents();
 
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
