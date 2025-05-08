@@ -1,4 +1,4 @@
-// Barra tipo Pong en OpenGL 3.3 - Movimiento horizontal con teclas
+// Barra tipo Pong en OpenGL 3.3 - Movimiento horizontal con teclas // Fernando González y Emanuel Diaz
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
