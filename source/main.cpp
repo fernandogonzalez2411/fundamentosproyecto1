@@ -60,9 +60,13 @@ Rectangle paddleRightTop({0.9f, 0.5f}, paddleWidth, paddleHeight, 2);
 Rectangle paddleRightBottom({0.9f, -0.5f}, paddleWidth, paddleHeight, 3);
 Rectangle ball({0, 0}, ballRadius, ballRadius, 4);
 
-float speedPaddleY = 0.002f; // Velocidad de las barras
-std::pair<float, float> speedBall = {0.004f, 0.003f}; // Velocidad de la pelota (X, Y)
-float speedMultiplier = 1.0f; // Multiplicador de Velocidad (para adaptarlo a diferentes computadoras debido a la ausencia de deltaTime)
+float speedPaddleY = 1.0f; // Velocidad de las barras (unidades por segundo)
+std::pair<float, float> speedBall = {1.0f, 0.5f}; // Velocidad de la pelota (X, Y) (unidades por segundo)
+float targetFPS = 60.0f; // FPS objetivo para calcular velocidades base
+
+// Variables para el deltaTime
+float deltaTime = 0.0f;
+float lastFrameTime = 0.0f;
 
 // Procesa la entrada del teclado para mover las barras
 void processInput(GLFWwindow* window) {
@@ -70,14 +74,14 @@ void processInput(GLFWwindow* window) {
     auto posLeftBottom = paddleLeftBottom.getPos();
 
     // Movimiento hacia arriba de la barra izquierda
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && posLeftTop.second + (paddleLeftTop.getHeight() / 2) + speedPaddleY*speedMultiplier <= 1) {
-        posLeftTop.second += speedPaddleY*speedMultiplier;
-        posLeftBottom.second -= speedPaddleY*speedMultiplier;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && posLeftTop.second + (paddleLeftTop.getHeight() / 2) + speedPaddleY * deltaTime <= 1) {
+        posLeftTop.second += speedPaddleY * deltaTime;
+        posLeftBottom.second -= speedPaddleY * deltaTime;
     }
     // Movimiento hacia abajo de la barra izquierda
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && posLeftTop.second - (paddleLeftTop.getHeight() / 2) - speedPaddleY*speedMultiplier >= 0) {
-        posLeftTop.second -= speedPaddleY*speedMultiplier;
-        posLeftBottom.second += speedPaddleY*speedMultiplier;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && posLeftTop.second - (paddleLeftTop.getHeight() / 2) - speedPaddleY * deltaTime >= 0) {
+        posLeftTop.second -= speedPaddleY * deltaTime;
+        posLeftBottom.second += speedPaddleY * deltaTime;
     }
 
     // Aplicar nueva posición
@@ -88,14 +92,14 @@ void processInput(GLFWwindow* window) {
     auto posRightBottom = paddleRightBottom.getPos();
 
     // Movimiento hacia arriba de la barra derecha
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && posRightTop.second + (paddleRightTop.getHeight() / 2) + speedPaddleY*speedMultiplier <= 1) {
-        posRightTop.second += speedPaddleY*speedMultiplier;
-        posRightBottom.second -= speedPaddleY*speedMultiplier;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && posRightTop.second + (paddleRightTop.getHeight() / 2) + speedPaddleY * deltaTime <= 1) {
+        posRightTop.second += speedPaddleY * deltaTime;
+        posRightBottom.second -= speedPaddleY * deltaTime;
     }
     // Movimiento hacia abajo de la barra derecha
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && posRightTop.second - (paddleRightTop.getHeight() / 2) - speedPaddleY*speedMultiplier >= 0) {
-        posRightTop.second -= speedPaddleY*speedMultiplier;
-        posRightBottom.second += speedPaddleY*speedMultiplier;
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && posRightTop.second - (paddleRightTop.getHeight() / 2) - speedPaddleY * deltaTime >= 0) {
+        posRightTop.second -= speedPaddleY * deltaTime;
+        posRightBottom.second += speedPaddleY * deltaTime;
     }
 
     // Aplicar nueva posición
@@ -178,8 +182,16 @@ int main() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // Inicializar el tiempo del frame anterior
+    lastFrameTime = glfwGetTime();
+
     // Bucle principal del juego
     while (!glfwWindowShouldClose(window)) {
+        // Calcular delta time
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrameTime;
+        lastFrameTime = currentFrame;
+
         processInput(window); // Leer teclas y actualizar barras
 
         auto ballPos = ball.getPos();
@@ -194,23 +206,23 @@ int main() {
             speedBall.first *= -1;
             ballPos.first = paddleLeftTop.getPos().first + (paddleLeftTop.getWidth() / 2) + (ball.getWidth() / 2);
             int aux = speedBall.second > 0 ? 1 : -1;
-            speedBall.second = (((rand() % 6) + 1) / 1000.0f) * aux;
+            speedBall.second = (((rand() % 6) + 1) / 2.0f) * aux; // Ajustado para velocidad por segundo
         }
         // Colisión con barra derecha
         else if (ball.isColliding(paddleRightTop) || ball.isColliding(paddleRightBottom)) {
             speedBall.first *= -1;
             ballPos.first = paddleRightTop.getPos().first - (paddleRightTop.getWidth() / 2) - (ball.getWidth() / 2);
             int aux = speedBall.second > 0 ? 1 : -1;
-            speedBall.second = (((rand() % 6) + 1) / 1000.0f) * aux;
+            speedBall.second = (((rand() % 6) + 1) / 2.0f) * aux; // Ajustado para velocidad por segundo
         }
         else if (ballPos.first - (ball.getWidth() / 2) <= -1 || ballPos.first + (ball.getWidth() / 2) >= 1) {
             ballPos = {0, 0};
             speedBall.first *= -1;
         }
 
-        // Actualizar posición de la pelota
-        ballPos.first += speedBall.first*speedMultiplier;
-        ballPos.second += speedBall.second*speedMultiplier;
+        // Actualizar posición de la pelota usando deltaTime
+        ballPos.first += speedBall.first * deltaTime;
+        ballPos.second += speedBall.second * deltaTime;
         ball.setPos(ballPos);
 
         // Renderizado
